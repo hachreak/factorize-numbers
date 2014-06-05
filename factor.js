@@ -71,7 +71,7 @@ var factor = {
         error: function(jqxhr, textStatus){
           $('fieldset').addClass('error');
           $('fieldset').removeClass('success');
-          $('#result').html(header + textStatus);
+          $('#result').html(header + textStatus + " - HTTP " + jqxhr.status + " " + jqxhr.statusText);
         }
       });
     });
