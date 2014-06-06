@@ -8,6 +8,11 @@ use List::Util qw[min max];
 
 ##
 # Compute gcd (greatest common divisor)
+#
+# @param @u first number
+# @param @v second number
+# @return greatest common divisor
+#
 sub gcd($$) {
   my ($u, $v) = @_;
   while ($v) {
@@ -18,6 +23,9 @@ sub gcd($$) {
 
 ##
 # Test if is a prime number
+#
+# @param $num number to test
+# @return true if it's a prime number
 ##
 sub is_prime($){
   my ($num) = @_;
@@ -32,7 +40,8 @@ sub is_prime($){
 ###
 # Factorize a integer number.
 #
-# @param val number to factorize
+# @param $val number to factorize
+# @param @fact array of already found divisors
 # @return array of prime numbers
 ##
 sub myfactorize{
@@ -68,11 +77,19 @@ sub factorize_pollard_rho{
   # input data: number to factorize
   my($val, @fact) = @_;
 
+  # init randomizer
+  srand(time() | $$);
+ 
+  if($val == 1){
+    push(@fact, 1);
+    return @fact;
+  }
+
+  # test if even number
   if($val % 2 == 0){
     if($val != 2){
       # requires further decomposition
       @fact = factorize_pollard_rho($val / 2, @fact);
-      print 2, " ";
       push(@fact, 2);
       return @fact;
     }
@@ -92,17 +109,21 @@ sub factorize_pollard_rho{
   }
 
   if($g == $val){
+     # try to see if it's a "semiprime"
      if(is_prime($g)){
-       print $g," ";
+       # finish: push in array
        push(@fact, $g);
      }else{
+       # try to decompose in prime numbers
        @fact = factorize_pollard_rho($g, @fact);
      }
   }else{
+     # found n*q=val, continues to decompose in prime numbers
      @fact = factorize_pollard_rho($g, @fact);
      @fact = factorize_pollard_rho($val / $g, @fact);
   }
 
+  # return the list of prime numbers found
   return @fact;
 }
 
@@ -110,11 +131,19 @@ sub factorize_brent{
   # input data: number to factorize
   my($val, @fact) = @_;
 
+  # init randomizer
+  srand(time() | $$);
+
+  if($val == 1){
+    push(@fact, 1);
+    return @fact;
+  }
+
+  # test if it's a even number
   if($val % 2 == 0){
     if(2 != $val){
       @fact = factorize_brent($val / 2, @fact);
     }
-    print 2,"\n";
     push(@fact, 2);
     return @fact;
   } 
@@ -163,7 +192,6 @@ sub factorize_brent{
 
   if($g == $val){
      if(is_prime($g)){
-       print $g," ";
        push(@fact, $g);
      }else{
        @fact = factorize_brent($g, @fact);
@@ -175,12 +203,12 @@ sub factorize_brent{
   return @fact;
 }
 
-=for
 # CGI 
 my $q = CGI->new;
 
 # Process an HTTP request
 my $val = $q->param('number');
+my $algorithm = $q->param('algorithm');
 
 # Check input data, unless return a error!
 unless ($val =~ /^\d+$/){
@@ -190,17 +218,27 @@ unless ($val =~ /^\d+$/){
 
 # Prepare various HTTP responses
 print $q->header('application/json');
-=cut
 
-my $val = 59765903376552948163;
+#my $val = 59765903376552948163;
 #my $val = 40;
 #my $val = 779;
-# Factorize number!
-my @fact = myfactorize($val);
-#my @fact = factorize_pollard_rho($val);
-#my @fact = factorize_brent($val);
 
-print "\n";
+# Factorize number!
+my @fact = ();
+if($algorithm eq 'myfactorize'){
+  @fact = myfactorize($val);
+  push(@fact, 'my');
+}else{
+  if($algorithm eq 'pollard_rho'){
+    @fact = factorize_pollard_rho($val);
+    push(@fact, 'poll');
+  }else{
+    if($algorithm eq 'brent'){
+      @fact = factorize_brent($val);
+      push(@fact, 'brent');
+    }
+  }
+}
+
 # Print result in JSON..
 print "[\"",join('","', @fact),"\"]";
-print "\n";

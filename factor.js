@@ -37,7 +37,7 @@ var factor = {
    * Function that query the back-end and print the result.
    *
    */
-  factor: function() {
+  factor: function(algorithm) {
 
     $(document).ready(function() {
       var value = $('#number').val();
@@ -51,7 +51,7 @@ var factor = {
       // ok, start ajax call
       $.ajax({
         url: 'cgi-bin/factor.cgi',
-        data: 'number=' + value,
+        data: 'number=' + value + '&algorithm=' + algorithm,
         dataType: 'json',
         timeout: 5 * 60 * 1000, // 5 min
         // called if beck-end return the result
