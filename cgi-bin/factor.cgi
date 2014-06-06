@@ -11,7 +11,6 @@ use List::Util qw[min max];
 sub gcd($$) {
   my ($u, $v) = @_;
   while ($v) {
-#print "u: ",$u," v: ",$v,"\n";
     ($u, $v) = ($v, $u % $v);
   }
   return abs($u);
@@ -42,29 +41,18 @@ sub myfactorize{
   # output data: array of prime numbers
   my @fact = ();
   
-  # Uncomment to remove duplicate
-  # my $last = 0;
-
   # Even numbers: look if the number is divisible for 2
   while ($val%2 == 0) {
-  # Uncomment next 3 lines to remove duplicate
-  # if($last != 2){
-      push(@fact, 2);
-  # }
+    push(@fact, 2);
     $val = $val/2;
-  # $last = 2;
   }
  
   # Odd numbers:
   for (my $i = 3; $i <= (int(sqrt($val))+1); $i = $i+2) {
     # While i divides n
     while ($val % $i == 0){
-    # Uncomment next 3 lines to remove duplicate
-    # if($last != $i){
-        push(@fact, $i);
-    # }
+      push(@fact, $i);
       $val = $val / $i;
-    # $last = $i;
     }
   }
  
@@ -78,14 +66,15 @@ sub myfactorize{
 
 sub factorize_pollard_rho{
   # input data: number to factorize
-  my $val = $_[0];
+  my($val, @fact) = @_;
 
   if($val % 2 == 0){
     if($val != 2){
       # requires further decomposition
-      factorize_pollard_rho($val / 2);
+      @fact = factorize_pollard_rho($val / 2, @fact);
       print 2, " ";
-      return 2;
+      push(@fact, 2);
+      return @fact;
     }
   }
 
@@ -101,40 +90,33 @@ sub factorize_pollard_rho{
     $y = (($y * $y) % $val + $c) % $val;
     $g = gcd(abs($x - $y), $val);
   }
-=for
-print "g: ",$g," val: ",$val," g is prime:";
-if(is_prime($g)){
-  print "si";
-}else{
-  print "no";
-}
-print "\n";
-=cut
+
   if($g == $val){
      if(is_prime($g)){
        print $g," ";
+       push(@fact, $g);
      }else{
-       factorize_pollard_rho($g);
+       @fact = factorize_pollard_rho($g, @fact);
      }
   }else{
-     factorize_pollard_rho($g);
-     factorize_pollard_rho($val / $g);
+     @fact = factorize_pollard_rho($g, @fact);
+     @fact = factorize_pollard_rho($val / $g, @fact);
   }
 
-  return $g;
+  return @fact;
 }
 
 sub factorize_brent{
   # input data: number to factorize
-  my $val = $_[0];
+  my($val, @fact) = @_;
 
   if($val % 2 == 0){
-    if(2 == $val){
-      print 2,"\n"
-    }else{
-      factorize_brent($val / 2);
+    if(2 != $val){
+      @fact = factorize_brent($val / 2, @fact);
     }
-    return 2;
+    print 2,"\n";
+    push(@fact, 2);
+    return @fact;
   } 
 
   # random number in range [1, $val - 1]
@@ -182,14 +164,15 @@ sub factorize_brent{
   if($g == $val){
      if(is_prime($g)){
        print $g," ";
+       push(@fact, $g);
      }else{
-       factorize_brent($g);
+       @fact = factorize_brent($g, @fact);
      }
   }else{
-    factorize_brent($g);
-    factorize_brent($val / $g);
+    @fact = factorize_brent($g, @fact);
+    @fact = factorize_brent($val / $g, @fact);
   }
-  return $g;
+  return @fact;
 }
 
 =for
@@ -210,29 +193,14 @@ print $q->header('application/json');
 =cut
 
 my $val = 59765903376552948163;
-#my $val = 597659033765529481630;
+#my $val = 40;
 #my $val = 779;
 # Factorize number!
-my $start_run = time();
 my @fact = myfactorize($val);
-my $end_run = time();
-my $run_time = $end_run - $start_run;
-print "Job took $run_time seconds\n";
-
-$start_run = time();
-my @fact2 = factorize_pollard_rho($val);
-$end_run = time();
-$run_time = $end_run - $start_run;
-print "Job took $run_time seconds\n";
-
-$start_run = time();
-my @fact3 = factorize_brent($val);
-$end_run = time();
-$run_time = $end_run - $start_run;
-print "Job took $run_time seconds\n";
-
-
+#my @fact = factorize_pollard_rho($val);
+#my @fact = factorize_brent($val);
 
 print "\n";
 # Print result in JSON..
 print "[\"",join('","', @fact),"\"]";
+print "\n";
