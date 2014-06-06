@@ -59,15 +59,19 @@ my $val = $q->param('number');
 
 # Check input data, unless return a error!
 unless ($val =~ /^\d+$/){
- print $q->header('type application/json','422 Invalid input data!');
+ print $q->header('application/json','422 Invalid input data!');
  exit;
 }
 
 # Prepare various HTTP responses
 print $q->header('application/json');
 
+#my $start_run = time();
 # Factorize number!
 my @fact = factorize($val);
+#my $end_run = time();
+#my $run_time = $end_run - $start_run;
+#print "Job took $run_time seconds\n";
 
 # Print result in JSON..
 print "[\"",join('","', @fact),"\"]";
