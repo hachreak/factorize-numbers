@@ -246,15 +246,12 @@ unless ($val =~ /^\d+$/ && $algorithm =~ /^[a-zA-Z0-9]+$/){
 my @fact = ();
 if($algorithm eq 'myfactorize'){
   @fact = myfactorize($val);
-  push(@fact, 'my');
 }else{
   if($algorithm eq 'pollardrho'){
     @fact = factorize_pollard_rho($val);
-    push(@fact, 'poll');
   }else{
     if($algorithm eq 'brent'){
       @fact = factorize_brent($val);
-      push(@fact, 'brent');
     }else{ 
       print $q->header('application/json','422 Invalid algorithm!');
       exit;
