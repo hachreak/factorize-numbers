@@ -38,10 +38,9 @@ sub is_prime($){
 }
 
 ###
-# Factorize a integer number.
+# 1° Algorithm: Factorize a integer number.
 #
 # @param $val number to factorize
-# @param @fact array of already found divisors
 # @return array of prime numbers
 ##
 sub myfactorize{
@@ -73,6 +72,13 @@ sub myfactorize{
   return @fact;
 }
 
+###
+# 2° Algorithm: Factorize a integer number using Pollard-Rho algorithm.
+#
+# @param $val number to factorize
+# @param @fact array of already found divisors
+# @return array of prime numbers
+##
 sub factorize_pollard_rho{
   # input data: number to factorize
   my($val, @fact) = @_;
@@ -80,6 +86,7 @@ sub factorize_pollard_rho{
   # init randomizer
   srand(time() | $$);
  
+  # if $val is equal to 1, don't continues
   if($val == 1){
     push(@fact, 1);
     return @fact;
@@ -95,12 +102,13 @@ sub factorize_pollard_rho{
     }
   }
 
-  # random number in range [1, $val - 1]
+  # random number in range [1, $val - 1] and init vars
   my $x = int(rand($val - 1)) + 1;
   my $y = $x;
   my $c = int(rand($val - 1)) + 1;
   my $g = 1;
  
+  # try to decompose
   while($g == 1){
     $x = (($x * $x) % $val + $c) % $val;
     $y = (($y * $y) % $val + $c) % $val;
@@ -108,10 +116,11 @@ sub factorize_pollard_rho{
     $g = gcd(abs($x - $y), $val);
   }
 
+  # looks the result
   if($g == $val){
      # try to see if it's a "semiprime"
      if(is_prime($g)){
-       # finish: push in array
+       # it's a prime number, finish! push the result in array
        push(@fact, $g);
      }else{
        # try to decompose in prime numbers
@@ -127,6 +136,13 @@ sub factorize_pollard_rho{
   return @fact;
 }
 
+###
+# 3° Algorithm: Factorize a integer number using Brent algorithm (Pollard-Rho optimization).
+#
+# @param $val number to factorize
+# @param @fact array of already found divisors
+# @return array of prime numbers
+##
 sub factorize_brent{
   # input data: number to factorize
   my($val, @fact) = @_;
@@ -134,6 +150,7 @@ sub factorize_brent{
   # init randomizer
   srand(time() | $$);
 
+  # if $val is equal to 1, don't continues
   if($val == 1){
     push(@fact, 1);
     return @fact;
@@ -160,6 +177,7 @@ sub factorize_brent{
   my $ys = 1;
   my $x = 1;
 
+  # try to decompose
   while($g == 1){
     my $x = $y;
     my $k = 0;
@@ -190,18 +208,26 @@ sub factorize_brent{
     }
   }
 
+  # looks the result
   if($g == $val){
+     # try to see if it's a "semiprime"
      if(is_prime($g)){
+       # it's a prime number, finish! push the result in array
        push(@fact, $g);
      }else{
+       # try to decompose in prime numbers
        @fact = factorize_brent($g, @fact);
      }
   }else{
+    # found n*q=val, continues to decompose in prime numbers
     @fact = factorize_brent($g, @fact);
     @fact = factorize_brent($val / $g, @fact);
   }
+
   return @fact;
 }
+
+#############################
 
 # CGI 
 my $q = CGI->new;
@@ -210,18 +236,11 @@ my $q = CGI->new;
 my $val = $q->param('number');
 my $algorithm = $q->param('algorithm');
 
-# Check input data, unless return a error!
-unless ($val =~ /^\d+$/){
+# Securely check input data, unless return a error!
+unless ($val =~ /^\d+$/ && $algorithm =~ /^[a-zA-Z0-9]+$/){
  print $q->header('application/json','422 Invalid input data!');
  exit;
 }
-
-# Prepare various HTTP responses
-print $q->header('application/json');
-
-#my $val = 59765903376552948163;
-#my $val = 40;
-#my $val = 779;
 
 # Factorize number!
 my @fact = ();
@@ -229,16 +248,22 @@ if($algorithm eq 'myfactorize'){
   @fact = myfactorize($val);
   push(@fact, 'my');
 }else{
-  if($algorithm eq 'pollard_rho'){
+  if($algorithm eq 'pollardrho'){
     @fact = factorize_pollard_rho($val);
     push(@fact, 'poll');
   }else{
     if($algorithm eq 'brent'){
       @fact = factorize_brent($val);
       push(@fact, 'brent');
+    }else{ 
+      print $q->header('application/json','422 Invalid algorithm!');
+      exit;
     }
   }
 }
+
+# Prepare various HTTP responses
+print $q->header('application/json');
 
 # Print result in JSON..
 print "[\"",join('","', @fact),"\"]";

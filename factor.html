@@ -1,25 +1,32 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Integer Factorization</title>
-<script src="jquery-2.1.1.min.js"></script>
-<script src="factor.js"></script>
-<link rel="stylesheet" href="factor.css">
+  <meta charset="utf-8">
+  <title>Integer Factorization by Leonardo Rossi (hachreak)</title>
+  <script src="jquery-2.1.1.min.js"></script>
+  <script src="factor.js"></script>
+  <link rel="stylesheet" href="factor.css">
 </head>
 <body>
-<h1>Integer Factorization</h1>
-<input type="text" id="number">
-&nbsp;
-<button type="button" onclick="factor.factor('myfactorize')">Factor Me! (1° algorithm)</button>
-<button type="button" onclick="factor.factor('pollard_rho')">Factor Me! (2° algorithm - Pollard-Rho)</button>
-<button type="button" onclick="factor.factor('brent')">Factor Me! (3° algorithm - Brent)</button>
-<p>
-<fieldset>
-<legend>Reply</legend>
-<div id="result">
+  <div>
+    <h1>Integer Factorization by Leonardo Rossi (hachreak)</h1>
+    <input type="text" id="number">
+    &nbsp;
+    <button type="button" onclick="factor.factor('myfactorize')">Factor Me! (1° algorithm)</button>
+    <button type="button" onclick="factor.factor('pollardrho')">Factor Me! (2° algorithm - Pollard-Rho)</button>
+    <button type="button" onclick="factor.factor('brent')">Factor Me! (3° algorithm - Brent)</button>
+  </div>
+  <div>
+    <fieldset>
+      <legend>Reply</legend>
+      <div id="result">
 	Enter a number and press the button to factorize it. 
-</div>
-</fieldset>
-
+      </div>
+    </fieldset>
+  </div>
+  <div id="notes">
+    <b>Note</b>: First algorithm is quick if the number of digits is not high.<br>
+    Otherwise, the other two algorithms should be faster, because are based on Floyd's cycle-finding algorithm and on the observation that (as in the birthday problem) two numbers x and y are congruent modulo p with probability 0.5 after 1.177(sqrt{p}) numbers have been randomly chosen.
+  </div>
+</body>
 </html>

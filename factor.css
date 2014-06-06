@@ -1,2 +1,4 @@
 .success{ background-color: #F4F8FA; color: black; }
 .error{ background-color: #FDF7F7; color: red; }
+div{ margin-bottom: 1em; }
+#notes{ font-size: 0.8em; }
