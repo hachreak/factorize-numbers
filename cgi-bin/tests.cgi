@@ -9,7 +9,7 @@ use List::Util qw[min max];
 use factor_lib qw(gcd is_prime myfactorize factorize_pollard_rho factorize_brent);
 
 my $MAX = 10000000000;
-my $CICLES = 1000;
+my $CICLES = 20;
 
 #############################
 
@@ -27,7 +27,7 @@ sub test_factor_lib{
     }
 
     if($DEBUG){
-      print "[",$val,"]\n";
+      print "Number ",$i," [",$val,"]\n";
     }
 
     # Factorize number!
@@ -57,17 +57,17 @@ sub test_factor_lib{
     }
 
     if(scalar @fact1 != scalar @fact2 || scalar @fact2 != scalar @fact3){
-      print "Assert error: number of elements found is different!\n";
+      print "[ASSERT ERROR] number of elements found is different!\n";
     }
 
     for(my $i=0; $i<scalar @fact1; $i++){
       if($fact1[$i] != $fact2[$i] || $fact2[$i] != $fact3[$i]){
-        print "Assert error: some elements found is different!\n";
+        print "[ASSERT ERROR] some elements found is different!\n";
       }
     }
 
     if($total1 != $total2 || $total2 != $total3 || $total3 != $val){
-      print "Assert error: the multiplication is different\n";
+      print "[ASSERT ERROR] the multiplication is different\n";
     }  
   }
 }
