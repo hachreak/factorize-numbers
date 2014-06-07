@@ -6,6 +6,7 @@ use strict;
 use bigint;
 use List::Util qw[min max];
 
+# my lib
 use factor_lib qw(gcd is_prime myfactorize factorize_pollard_rho factorize_brent);
 
 #############################
@@ -22,6 +23,9 @@ unless ($val =~ /^\d+$/ && $algorithm =~ /^[a-zA-Z0-9]+$/){
  print $q->header('application/json','422 Invalid input data!');
  exit;
 }
+
+# init randomizer
+srand(time() | $$);
 
 # Factorize number!
 my @fact = ();

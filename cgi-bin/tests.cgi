@@ -13,8 +13,6 @@ my $CICLES = 20;
 
 #############################
 
-srand(time() | $$);
-
 sub test_factor_lib{
   my($MAX, $CICLES, $IS_RAND, $DEBUG) = @_;
   my $val = 0;
